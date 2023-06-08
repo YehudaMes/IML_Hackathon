@@ -123,5 +123,3 @@ def load_test_agoda_data_task1():
     path = "agoda_data/Agoda_Test_1.csv"
     return preprocess_predict_task1(path)
 
-
-load_train_agoda_data_task1()
