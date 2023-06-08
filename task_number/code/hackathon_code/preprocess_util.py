@@ -28,7 +28,7 @@ def cancellation_policy_cost_function(x: list, func):
         else:
             cost_in_days=vecay_len*int(cost[:-1])/100
         costs.append(cost_in_days*(days+1))
-    return np.func(costs)
+    return func(costs)
 
 
 
