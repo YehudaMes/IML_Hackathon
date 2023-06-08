@@ -89,8 +89,6 @@ def preprocess_test_task2(df):
     # and count the occurrences of 1s and 0s
     counts = df.groupby(['customer_nationality', 'cancellation_indicator']).size().unstack(fill_value=0)
 
-    Assuming your DataFrame is named 'df' and contains the columns 'customer_nationality' and 'cancellation_indicator'
-
     # Create a bar plot
     fig = px.histogram(df, x='customer_nationality', color='cancellation_indicator', barmode='group')
     # fig = px.histogram(counts, x='customer_nationality', color='cancellation_indicator', barmode='group')
@@ -107,7 +105,6 @@ def preprocess_test_task2(df):
 
     # Show the plot
     fig.show()
-    Assuming your DataFrame is named 'df'
 
     # Group the DataFrame by 'customer_nationality' and calculate the value counts of 'cancellation_indicator'
     grouped_counts = df.groupby('customer_nationality')['cancellation_indicator'].value_counts(normalize=True).unstack()
@@ -136,7 +133,6 @@ def preprocess_test_task2(df):
 
     # Show the plot
     fig.show()
-
 
 
 if __name__ == "__main__":
