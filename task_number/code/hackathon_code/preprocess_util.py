@@ -1,4 +1,7 @@
 import pandas as pd
+import numpy as np
+
+
 
 
 def booking_to_checkin_feature(df):
@@ -8,9 +11,38 @@ def booking_to_checkin_feature(df):
     df["checkin_to_checkout"] = pd.to_datetime(df["checkout_date"]) - pd.to_datetime(df["checkin_date"])
     df["checkin_to_checkout"] = df["checkin_to_checkout"].fillna(pd.Timedelta(1)).dt.days.astype(int)
 
+def cancellation_policy_cost_function(x: list):
+    vecay_len, booking_time, policies=int(x[0]), int(x[1]), x[2:]
+    if not policies:
+        return 0
+    costs=[]
+    for policy in policies:
+        if "D" in policy:
+            days, cost=policy.split("D")
+            days=min(int(days),booking_time)
+        else:
+            cost=policy
+            days=0
+        if "N" in cost:
+            cost_in_days=min(int(cost[:-1]), vecay_len)
+        else:
+            cost_in_days=vecay_len*int(cost[:-1])/100
+        costs.append(cost_in_days*(days+1))
+    return np.mean(costs)
+
+
+
+def cancellation_cost_feature(df):
+    df.cancellation_policy_code = df.cancellation_policy_code.replace({"UNKNOWN": "0D0N"})
+    df.cancellation_policy_code = df.checkin_to_checkout.astype(str) + "_" + df.booking_to_checkin.astype(
+        str) + "_" + df.cancellation_policy_code
+    df.cancellation_policy_code = df.cancellation_policy_code.apply(
+        lambda x: cancellation_policy_cost_function(x.split("_")))
+
 
 def common_column_edit(df, cols_to_drop, cols_to_dummies):
     booking_to_checkin_feature(df)
+    cancellation_cost_feature(df)
     df["is_first_booking"] = df["is_first_booking"].astype(int)
     df = df.drop(cols_to_drop, axis=1)
     df = pd.get_dummies(df, columns=cols_to_dummies)
