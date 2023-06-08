@@ -247,4 +247,4 @@ if __name__ == "__main__":
     # search_best_hyperparameters(X, y)
     # evaluate_different_models(data, y)
 
-    fit_and_save_model(X, y)
+    # fit_and_save_model(X, y)
