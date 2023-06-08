@@ -21,9 +21,10 @@ def validation_indexes(data_len, validation_len):
 def split_save_data():
     df = pd.read_csv(DATA_PATH)
     validation_inds = validation_indexes(len(df), len(df) // 4)
-    validation_set = df[validation_inds]
+    validation_set = df.iloc[validation_inds]
     validation_set.to_csv(VALIDATION_PATH + "validation.csv")
     df.drop(validation_inds).to_csv(VALIDATION_PATH + "train.csv")
 
 if __name__ == '__main__':
+    create_data_directories()
     split_save_data()
