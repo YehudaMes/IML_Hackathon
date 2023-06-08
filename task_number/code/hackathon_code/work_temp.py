@@ -5,9 +5,10 @@ def naive_preprocess():
     TRAIN_PATH = "./data/train.csv"
     # Read the CSV file into a pandas DataFrame
     data = pd.read_csv(TRAIN_PATH)
+    y = data["cancellation_datetime"].notnull().astype(int)
+
     data.fillna(0, inplace=True)
     # Remove textual columns
-    y = data["cancellation_datetime"].notnull().astype(int)
 
     data = data.select_dtypes(exclude=['object'])
     # Identify columns with boolean values
