@@ -2,8 +2,8 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 DATA_PATH = "../../../Agoda - Data/agoda_cancellation_train.csv"
-TRAIN_PATH = "data/Train.cvs"
-VALIDATION_PATH = "data/Validation.cvs"
+TRAIN_PATH = "data/train.cvs"
+VALIDATION_PATH = "data/validation.cvs"
 RANDOM_SEED = 0
 TEST_SIZE = 0.2
 
