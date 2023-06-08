@@ -52,8 +52,8 @@ def find_best_model(df_results):
 def plot_results(df_results, title):
     fig = go.Figure()
     fig.add_trace(
-        go.Scatter(mode="markers", marker=dict(size=10), name='Accuracy', x=df_results[0],
-                   y=df_results['Accuracy'])
+        go.Scatter(mode="markers", marker=dict(size=10), name='F1-score', x=df_results[0],
+                   y=df_results['F1-score'])
     )
     # Update the layout of the plot
     fig.update_layout(
@@ -128,7 +128,7 @@ def choose_cross_validation_classification_model(X: np.ndarray, y: np.ndarray) -
         results.append((name, scores.mean()))
 
     # Create a DataFrame to store the results
-    df_results = pd.DataFrame(results, columns=['Model', 'Accuracy'])
+    df_results = pd.DataFrame(results, columns=['Model', 'F1-score'])
 
     # Get the best model (the one with the highest accuracy)
     best_model = find_best_model(df_results)
@@ -183,10 +183,11 @@ def kernel_methods_classification(X: np.ndarray, y: np.ndarray):
         model.fit(X_train_pca, y_train)
         y_pred = model.predict(X_test_pca)
         accuracy = accuracy_score(y_test, y_pred)
-        results.append((kernel, accuracy))
+        f1 = f1_score(y_test,y_pred)
+        results.append((kernel, accuracy, f1))
 
     # Create a DataFrame to store the results
-    df_results = pd.DataFrame(results, columns=['Kernel Method', 'Accuracy'])
+    df_results = pd.DataFrame(results, columns=['Kernel Method', 'Accuracy', 'F1-score'])
 
     best_model = find_best_model(df_results)
     # Print the best model
@@ -232,13 +233,14 @@ def search_best_hyperparameters(X: np.ndarray, y: np.ndarray):
 
 
 if __name__ == "__main__":
-    from work_temp import naive_preprocess
-    X, y = naive_preprocess()
+    from preproccer_task1 import load_data
+    df = load_data()
+    X, y = df.loc[:, df.columns != "cancellation_indicator"], df.cancellation_indicator
     # plot_data(data,y)
-    # choose_classification_model(X, y)
-    # cross_validation_classification_model(X, y)
+    choose_classification_model(X, y)
+    # choose_cross_validation_classification_model(X, y)
     # ensemble_classification_model(X, y)
     # kernel_methods_classifcation(X,y)
-    search_best_hyperparameters(X, y)
+    # search_best_hyperparameters(X, y)
     # evaluate_different_models(data, y)
 
