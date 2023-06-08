@@ -6,6 +6,3 @@ TRAIN_PATH = "/data/train.cvs"
 data = pd.read_csv(TRAIN_PATH)
 
 
-def hey:
-    pass
-
