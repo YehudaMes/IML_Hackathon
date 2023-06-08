@@ -38,6 +38,7 @@ COLS_TO_DROP = ["h_booking_id",
                 "is_user_logged_in",
                 "original_payment_currency",
                 "original_payment_method",
+                "cancellation_policy_code",
                 "language"]
 
 COLUMNS_TO_DUMMIES = [
@@ -46,7 +47,6 @@ COLUMNS_TO_DUMMIES = [
     "guest_nationality_country_name",
     "hotel_country_code",
     "hotel_area_code",
-    "cancellation_policy_code",
     "original_payment_type",
     "customer_nationality"]
 
@@ -55,7 +55,7 @@ def preprocess_train_task1(path):
     df = pd.read_csv(path)
     df["cancellation_indicator"] = df["cancellation_datetime"].notnull().astype(int)  # Task 1 labeling
 
-    df = common_column_edit(df)
+    df = common_column_edit(df, COLS_TO_DROP, COLUMNS_TO_DUMMIES)
 
     df = df[df['hotel_star_rating'].isin(np.arange(0, 5.5, 0.5))]
 
