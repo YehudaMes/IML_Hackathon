@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 DATA_PATH = "../../../Agoda - Data/agoda_cancellation_train.csv"  # todo: at end this one should be used!
 # DATA_PATH = "data/train.csv"
 
-pd.set_option('display.max_rows', None)
+# pd.set_option('display.max_rows', None)
 
 FULL_TRAIN_MEAN_DICT = {'hotel_star_rating': 3,
                         'no_of_adults': 2,

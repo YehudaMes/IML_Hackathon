@@ -28,6 +28,16 @@ def produce_days_before_cancelling_feature(df):
     df["days_before_cancelled"] = df["days_before_cancelled"].fillna(pd.Timedelta(0)).dt.days.astype(int)
 
 
+def load_train_data():
+    DATA_PATH = "data/train.csv"
+    return preprocess_train_task1(DATA_PATH)
+
+
+def load_agoda_data():
+    DATA_PATH = "../../../Agoda - Data/agoda_cancellation_train.csv"
+    return preprocess_train_task1(DATA_PATH)
+
+
 # Classification
 def preprocess_train_task1():
     df = pd.read_csv(DATA_PATH)
@@ -39,6 +49,7 @@ def preprocess_train_task1():
     df = df.drop(COLS_TO_DROP, axis=1)
     df = df[df['hotel_star_rating'].isin(np.arange(0, 5.5, 0.5))]
     df = pd.get_dummies(df, columns=COLUMNS_TO_DUMMIES)
+
     return df
 
 

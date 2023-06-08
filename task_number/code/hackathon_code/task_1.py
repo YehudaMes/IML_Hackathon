@@ -32,7 +32,7 @@ models = [
     # ("QDA", QuadraticDiscriminantAnalysis()),
     ('Logistic Regression', LogisticRegression(max_iter=1000)),
     ('Generic Random Forest', RandomForestClassifier()),
-    ('Support Vector Machines', SVC()),
+    # ('Support Vector Machines', SVC()),
     ('Gradient Boosting', GradientBoostingClassifier())
 ]
 
@@ -122,6 +122,7 @@ def choose_cross_validation_classification_model(X: np.ndarray, y: np.ndarray) -
 
         print(f"{name} scores: \naccuracy: {scores.mean()},\n\n")
         results.append((name, scores.mean()))
+
 
     # Create a DataFrame to store the results
     df_results = pd.DataFrame(results, columns=['Model', 'F1-score'])
@@ -238,7 +239,7 @@ if __name__ == "__main__":
     X, y = df.loc[:, df.columns != "cancellation_indicator"], df.cancellation_indicator
     # plot_data(data,y)
     # choose_classification_model(X, y)
-    # choose_cross_validation_classification_model(X, y)
+    choose_cross_validation_classification_model(X, y)
     # ensemble_classification_model(X, y)
     # kernel_methods_classifcation(X,y)
     # search_best_hyperparameters(X, y)
