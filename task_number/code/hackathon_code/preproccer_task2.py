@@ -78,36 +78,76 @@ def preprocess_train_task2(data_path):
     #
     # print(columns)
     # df = pd.get_dummies(df, columns=COLUMNS_TO_DUMMIES)
-    preprocess_test_task2(df)
 
-
+    return df
 def preprocess_test_task2(df):
     # cols = "guest_nationality_country_name", "customer_nationality"
     # df = pd.get_dummies(df, columns=cols)
     # cancellation_indicator
 
-    # and count the occurrences of 1s and 0s
-    counts = df.groupby(['customer_nationality', 'cancellation_indicator']).size().unstack(fill_value=0)
+    # # and count the occurrences of 1s and 0s
+    # counts = df.groupby(['customer_nationality', 'cancellation_indicator']).size().unstack(fill_value=0)
+    #
+    # # Create a bar plot
+    # fig = px.histogram(df, x='customer_nationality', color='cancellation_indicator', barmode='group')
+    # # fig = px.histogram(counts, x='customer_nationality', color='cancellation_indicator', barmode='group')
+    #
+    # # Update layout
+    # fig.update_layout(
+    #     title='Cancellation Indicator by Customer Nationality',
+    #     xaxis_title='Customer Nationality',
+    #     yaxis_title='Count',
+    #     legend_title='Cancellation Indicator',
+    #     xaxis={'categoryorder': 'total descending'},
+    #     barmode='group'
+    # )
+    #
+    # # Show the plot
+    # fig.show()
+    #
+    # # Group the DataFrame by 'customer_nationality' and calculate the value counts of 'cancellation_indicator'
+    # grouped_counts = df.groupby('customer_nationality')['cancellation_indicator'].value_counts(normalize=True).unstack()
+    #
+    # # Create a new column with the ratio of 1s
+    # grouped_counts['Ratio of 1s'] = grouped_counts[1] * 100
+    #
+    # # Create a new column with the ratio of 0s
+    # grouped_counts['Ratio of 0s'] = grouped_counts[0] * 100
+    #
+    # # Reset the index to have 'customer_nationality' as a regular column
+    # grouped_counts = grouped_counts.reset_index()
+    #
+    # # Create a bar plot
+    # fig = px.bar(grouped_counts, x='customer_nationality', y=['Ratio of 1s', 'Ratio of 0s'],
+    #              title='Cancellation Indicator by Customer Nationality',
+    #              labels={'value': 'Ratio', 'variable': 'Cancellation Indicator'})
+    #
+    # # Update layout
+    # fig.update_layout(
+    #     yaxis=dict(tickformat='.1f', title='Ratio (%)'),
+    #     xaxis_title='Customer Nationality',
+    #     legend_title='Cancellation Indicator',
+    #     xaxis={'categoryorder': 'total descending'}
+    # )
+    #
+    # # Show the plot
+    # fig.show()
+    import pandas as pd
+    import plotly.express as px
 
-    # Create a bar plot
-    fig = px.histogram(df, x='customer_nationality', color='cancellation_indicator', barmode='group')
-    # fig = px.histogram(counts, x='customer_nationality', color='cancellation_indicator', barmode='group')
+    # Calculate the count of customer_nationality for each category
+    counts = df['customer_nationality'].value_counts().reset_index()
+    counts.columns = ['customer_nationality', 'Count']
 
-    # Update layout
-    fig.update_layout(
-        title='Cancellation Indicator by Customer Nationality',
-        xaxis_title='Customer Nationality',
-        yaxis_title='Count',
-        legend_title='Cancellation Indicator',
-        xaxis={'categoryorder': 'total descending'},
-        barmode='group'
-    )
+    # Filter out customer_nationality categories with less than 20 rows
+    counts_filtered = counts[counts['Count'] > 20]
 
-    # Show the plot
-    fig.show()
+    # Filter the original DataFrame based on the filtered customer_nationality categories
+    df_filtered = df[df['customer_nationality'].isin(counts_filtered['customer_nationality'])]
 
-    # Group the DataFrame by 'customer_nationality' and calculate the value counts of 'cancellation_indicator'
-    grouped_counts = df.groupby('customer_nationality')['cancellation_indicator'].value_counts(normalize=True).unstack()
+    # Group the filtered DataFrame by 'customer_nationality' and calculate the value counts of 'cancellation_indicator'
+    grouped_counts = df_filtered.groupby('customer_nationality')['cancellation_indicator'].value_counts(
+        normalize=True).unstack()
 
     # Create a new column with the ratio of 1s
     grouped_counts['Ratio of 1s'] = grouped_counts[1] * 100
@@ -120,7 +160,7 @@ def preprocess_test_task2(df):
 
     # Create a bar plot
     fig = px.bar(grouped_counts, x='customer_nationality', y=['Ratio of 1s', 'Ratio of 0s'],
-                 title='Cancellation Indicator by Customer Nationality',
+                 title='Cancellation Indicator by Customer Nationality (Categories with >20 Rows)',
                  labels={'value': 'Ratio', 'variable': 'Cancellation Indicator'})
 
     # Update layout

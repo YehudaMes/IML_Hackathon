@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
-# DATA_PATH = "../../../Agoda - Data/agoda_cancellation_train.csv" // todo: at end this one should be used!
+COLUMNS_DATA_PATH = './columns_data/task1_columns.txt'
 
 COLS_TO_DROP = ["h_booking_id", "hotel_id", "cancellation_datetime", "checkin_date", "checkout_date",
                 "hotel_brand_code", "hotel_chain_code", "hotel_live_date", "booking_datetime",
@@ -49,19 +49,35 @@ def preprocess_train_task1(path):
     df = df[df['hotel_star_rating'].isin(np.arange(0, 5.5, 0.5))]
     df = pd.get_dummies(df, columns=COLUMNS_TO_DUMMIES)
 
+    # Save the column names as a text file
+    with open(COLUMNS_DATA_PATH, 'w') as file:
+        file.write('\n'.join(df.columns))
+
     return df
 
 
-def preprocess_train_task2(path):
-    pass
+def preprocess_test_task1(path):
+    df = pd.read_csv(path)
+
+    # Read columns feature of Trained model
+    with open(COLUMNS_DATA_PATH, 'r') as file:
+        saved_column_names = file.read().splitlines()
+    print(len(saved_column_names))
 
 
-def preprocess_test(path):
-    pass
+    df["cancellation_indicator"] = df["cancellation_datetime"].notnull().astype(int)  # Task 1 labeling
+
+    produce_days_before_cancelling_feature(df)
+
+    df = df.drop(COLS_TO_DROP, axis=1)
+    df = df[df['hotel_star_rating'].isin(np.arange(0, 5.5, 0.5))]
+    df = pd.get_dummies(df, columns=COLUMNS_TO_DUMMIES)
 
 
-def preprocess_validation():
+
+def preprocess_validation_task1():
     path = "data/validation.csv"
     df = pd.read_csv(path)
 
-
+# load_agoda_data()
+# preprocess_test_task1(55)
