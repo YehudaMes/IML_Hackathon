@@ -1,9 +1,11 @@
 import pandas as pd
 import numpy as np
+
 import matplotlib.pyplot as plt
 import plotly.express as px
 from sklearn.model_selection import train_test_split
 
+COLUMNS_DATA_PATH = './columns_data/task2_columns.txt'
 DATA_PATH = "agoda_data/agoda_cancellation_train.csv"  # todo: at end this one should be used!
 # DATA_PATH = "data/train.csv"
 
@@ -16,15 +18,8 @@ FULL_TRAIN_MEAN_DICT = {'hotel_star_rating': 3,
                         'no_of_children': 0,
                         'days_before_cancelled': 10}
 
-SMALL_TRAIN_MEAN_DICT = {'hotel_star_rating': 3,
-                         'no_of_adults': 2,
-                         'no_of_extra_bed': 0,
-                         'no_of_room': 1,
-                         'no_of_children': 0,
-                         'days_before_cancelled': 10}
-
 COLS_TO_DROP = ["h_booking_id", "hotel_id", "cancellation_datetime", "checkin_date", "checkout_date",
-                "hotel_brand_code", "hotel_chain_code", "hotel_live_date", "booking_datetime",
+                "hotel_brand_code", "hotel_area_code", "hotel_live_date", "booking_datetime",
                 "request_nonesmoke", "request_latecheckin", "request_highfloor", "request_largebed",
                 "request_twinbeds", "request_airport", "request_earlycheckin",
                 "h_customer_id", "is_user_logged_in", "original_payment_currency",
@@ -32,10 +27,18 @@ COLS_TO_DROP = ["h_booking_id", "hotel_id", "cancellation_datetime", "checkin_da
 
 COLUMNS_TO_DUMMIES = [
     "accommadation_type_name", "charge_option", "guest_nationality_country_name",
-    "hotel_country_code", "hotel_area_code", "is_first_booking", "cancellation_policy_code",
+    "hotel_country_code", "hotel_chain_code", "is_first_booking", "cancellation_policy_code",
     "original_payment_type", "hotel_city_code", "origin_country_code", "customer_nationality"]
 
 COLUMS_TO_CHECK = ["charge_option", "guest_nationality_country_name"]
+
+
+def booking_to_checkin_feature(df):
+    df["booking_to_checkin"] = pd.to_datetime(df["checkin_date"]) - pd.to_datetime(df["booking_datetime"])
+    df["booking_to_checkin"] = df["booking_to_checkin"].fillna(pd.Timedelta(0)).dt.days.astype(int)
+
+    df["checkin_to_checkout"] = pd.to_datetime(df["checkout_date"]) - pd.to_datetime(df["checkin_date"])
+    df["checkin_to_checkout"] = df["checkin_to_checkout"].fillna(pd.Timedelta(1)).dt.days.astype(int)
 
 
 # Regression
@@ -43,6 +46,7 @@ def preprocess_train_task2(data_path):
     df = pd.read_csv(data_path)
 
     df["cancellation_indicator"] = df["cancellation_datetime"].notnull().astype(int)  # Task 1 labeling
+    booking_to_checkin_feature(df)
 
     df = df[df['hotel_star_rating'].isin(np.arange(0, 5.5, 0.5))]
     df['hotel_star_rating'] = df['hotel_star_rating'].clip(lower=0)
@@ -54,119 +58,31 @@ def preprocess_train_task2(data_path):
     df = df[df['no_of_extra_bed'].isin(np.arange(0, 6, 1))]
     df = df[df['no_of_room'].isin(np.arange(1, 10, 1))]
     df = df[df['no_of_children'].isin(np.arange(0, 11, 1))]
-    # df = df[df['days_before_cancelled'].isin(np.arange(0, 360, 1))]
-    df.loc[df['days_before_cancelled'] < 0, 'days_before_cancelled'] = 0
 
-    # print(df['accommadation_type_name'].unique())
     # df = pd.get_dummies(df, columns=['accommadation_type_name'])
     # yp = 'accommadation_type_name'
+    # df = pd.get_dummies(df, columns=COLUMNS_TO_DUMMIES)
 
-    # df = pd.get_dummies(df, columns=COLUMNS_TO_DUMMIES)
-    #
-    # columns = []
-    # for col in COLUMNS_TO_DUMMIES:
-    #     filtered_cols = df.filter(regex=f'^{col}')
-    #     columns += filtered_cols.columns.tolist()
-    #
-    # print(columns)
-    # df = pd.get_dummies(df, columns=COLUMNS_TO_DUMMIES)
+    # Save the column names as a text file
+    with open(COLUMNS_DATA_PATH, 'w') as file:
+        file.write('\n'.join(df.columns))
 
     return df
 
 
-def preprocess_test_task2(df):
-    # cols = "guest_nationality_country_name", "customer_nationality"
-    # df = pd.get_dummies(df, columns=cols)
-    # cancellation_indicator
+def preprocess_test_task2(path):
+    df = pd.read_csv(path)
 
-    # # and count the occurrences of 1s and 0s
-    # counts = df.groupby(['customer_nationality', 'cancellation_indicator']).size().unstack(fill_value=0)
-    #
-    # # Create a bar plot
-    # fig = px.histogram(df, x='customer_nationality', color='cancellation_indicator', barmode='group')
-    # # fig = px.histogram(counts, x='customer_nationality', color='cancellation_indicator', barmode='group')
-    #
-    # # Update layout
-    # fig.update_layout(
-    #     title='Cancellation Indicator by Customer Nationality',
-    #     xaxis_title='Customer Nationality',
-    #     yaxis_title='Count',
-    #     legend_title='Cancellation Indicator',
-    #     xaxis={'categoryorder': 'total descending'},
-    #     barmode='group'
-    # )
-    #
-    # # Show the plot
-    # fig.show()
-    #
-    # # Group the DataFrame by 'customer_nationality' and calculate the value counts of 'cancellation_indicator'
-    # grouped_counts = df.groupby('customer_nationality')['cancellation_indicator'].value_counts(normalize=True).unstack()
-    #
-    # # Create a new column with the ratio of 1s
-    # grouped_counts['Ratio of 1s'] = grouped_counts[1] * 100
-    #
-    # # Create a new column with the ratio of 0s
-    # grouped_counts['Ratio of 0s'] = grouped_counts[0] * 100
-    #
-    # # Reset the index to have 'customer_nationality' as a regular column
-    # grouped_counts = grouped_counts.reset_index()
-    #
-    # # Create a bar plot
-    # fig = px.bar(grouped_counts, x='customer_nationality', y=['Ratio of 1s', 'Ratio of 0s'],
-    #              title='Cancellation Indicator by Customer Nationality',
-    #              labels={'value': 'Ratio', 'variable': 'Cancellation Indicator'})
-    #
-    # # Update layout
-    # fig.update_layout(
-    #     yaxis=dict(tickformat='.1f', title='Ratio (%)'),
-    #     xaxis_title='Customer Nationality',
-    #     legend_title='Cancellation Indicator',
-    #     xaxis={'categoryorder': 'total descending'}
-    # )
-    #
-    # # Show the plot
-    # fig.show()
-    import pandas as pd
-    import plotly.express as px
+    # Read columns feature of Trained model
+    with open(COLUMNS_DATA_PATH, 'r') as file:
+        desired_columns = file.read().splitlines()
 
-    # Calculate the count of customer_nationality for each category
-    counts = df['customer_nationality'].value_counts().reset_index()
-    counts.columns = ['customer_nationality', 'Count']
+    desired_columns.remove("cancellation_indicator")
+    desired_columns.remove("original_selling_amount")
+    df = df.drop(COLS_TO_DROP, axis=1)
 
-    # Filter out customer_nationality categories with less than 20 rows
-    counts_filtered = counts[counts['Count'] > 20]
-
-    # Filter the original DataFrame based on the filtered customer_nationality categories
-    df_filtered = df[df['customer_nationality'].isin(counts_filtered['customer_nationality'])]
-
-    # Group the filtered DataFrame by 'customer_nationality' and calculate the value counts of 'cancellation_indicator'
-    grouped_counts = df_filtered.groupby('customer_nationality')['cancellation_indicator'].value_counts(
-        normalize=True).unstack()
-
-    # Create a new column with the ratio of 1s
-    grouped_counts['Ratio of 1s'] = grouped_counts[1] * 100
-
-    # Create a new column with the ratio of 0s
-    grouped_counts['Ratio of 0s'] = grouped_counts[0] * 100
-
-    # Reset the index to have 'customer_nationality' as a regular column
-    grouped_counts = grouped_counts.reset_index()
-
-    # Create a bar plot
-    fig = px.bar(grouped_counts, x='customer_nationality', y=['Ratio of 1s', 'Ratio of 0s'],
-                 title='Cancellation Indicator by Customer Nationality (Categories with >20 Rows)',
-                 labels={'value': 'Ratio', 'variable': 'Cancellation Indicator'})
-
-    # Update layout
-    fig.update_layout(
-        yaxis=dict(tickformat='.1f', title='Ratio (%)'),
-        xaxis_title='Customer Nationality',
-        legend_title='Cancellation Indicator',
-        xaxis={'categoryorder': 'total descending'}
-    )
-
-    # Show the plot
-    fig.show()
+    df = df.reindex(columns=desired_columns, fill_value=0)
+    return df
 
 
 if __name__ == "__main__":

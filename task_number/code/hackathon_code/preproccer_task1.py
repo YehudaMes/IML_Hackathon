@@ -22,12 +22,18 @@ COLS_TO_DROP = ["h_booking_id", "hotel_id", "cancellation_datetime", "checkin_da
                 "h_customer_id",
                 # "no_of_children", "no_of_adults",
                 # "no_of_extra_bed", "no_of_room",
-                "origin_country_code", "hotel_city_code", "is_user_logged_in", "original_payment_currency",
-                "original_payment_method", "guest_is_not_the_customer", "language"]
+                "origin_country_code", "hotel_city_code",
+                # "is_user_logged_in",
+                "original_payment_currency",
+                "original_payment_method",
+                # "guest_is_not_the_customer",
+                "language"]
 
 COLUMNS_TO_DUMMIES = [
     "accommadation_type_name", "charge_option", "guest_nationality_country_name",
-    "hotel_country_code", "hotel_area_code", "is_first_booking", "cancellation_policy_code",
+    "hotel_country_code", "hotel_area_code",
+    # "is_first_booking",
+    "cancellation_policy_code",
     "original_payment_type", "customer_nationality"]
 
 
@@ -46,6 +52,8 @@ def preprocess_train_task1(path):
     df = df[df['hotel_star_rating'].isin(np.arange(0, 5.5, 0.5))]
     df = df[df['booking_to_checkin'].isin(np.arange(0, 350, 1))]
     df = pd.get_dummies(df, columns=COLUMNS_TO_DUMMIES)
+    df["is_first_booking"] = df["is_first_booking"].astype(int)
+    df["is_user_logged_in"] = df["is_user_logged_in"].astype(int)
 
     # Save the column names as a text file
     with open(COLUMNS_DATA_PATH, 'w') as file:
