@@ -54,3 +54,14 @@ def preprocess_train_task1(path):
 
 def preprocess_train_task2(path):
     pass
+
+
+def preprocess_test(path):
+    pass
+
+
+def preprocess_validation():
+    path = "data/validation.csv"
+    df = pd.read_csv(path)
+
+
