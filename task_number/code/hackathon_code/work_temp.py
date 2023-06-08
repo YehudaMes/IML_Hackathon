@@ -5,7 +5,7 @@ def naive_preprocess():
     TRAIN_PATH = "./data/train.csv"
     # Read the CSV file into a pandas DataFrame
     data = pd.read_csv(TRAIN_PATH)
-    y = data["cancellation_datetime"].notnull().astype(int)
+    data["cancellation_indicator"] = data["cancellation_datetime"].notnull().astype(int)
 
     data.fillna(0, inplace=True)
     # Remove textual columns
@@ -21,4 +21,4 @@ def naive_preprocess():
     columns_to_remove = ['h_booking_id', 'hotel_id', 'h_customer_id']
 
     # Remove the specified columns
-    return data.drop(columns=columns_to_remove), y
+    return data.drop(columns=columns_to_remove)
