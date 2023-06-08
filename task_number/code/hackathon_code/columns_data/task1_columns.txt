@@ -1,7 +1,6 @@
 hotel_star_rating
 original_selling_amount
 cancellation_indicator
-days_before_cancelled
 accommadation_type_name_Apartment
 accommadation_type_name_Boat / Cruise
 accommadation_type_name_Bungalow

@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 from sklearn.model_selection import train_test_split
 
-DATA_PATH = "Agoda - Data/agoda_cancellation_train.csv"  # todo: at end this one should be used!
+DATA_PATH = "agoda_data/agoda_cancellation_train.csv"  # todo: at end this one should be used!
 # DATA_PATH = "data/train.csv"
 
 # pd.set_option('display.max_rows', None)
@@ -38,20 +38,12 @@ COLUMNS_TO_DUMMIES = [
 COLUMS_TO_CHECK = ["charge_option", "guest_nationality_country_name"]
 
 
-def produce_days_before_cancelling_feature(df):
-    df["cancellation_datetime"] = pd.to_datetime(df["cancellation_datetime"])
-    df["checkin_date"] = pd.to_datetime(df["checkin_date"])
-    df["days_before_cancelled"] = df["checkin_date"] - df["cancellation_datetime"]
-    df["days_before_cancelled"] = df["days_before_cancelled"].fillna(pd.Timedelta(0)).dt.days.astype(int)
-
-
 # Regression
 def preprocess_train_task2(data_path):
     df = pd.read_csv(data_path)
 
     df["cancellation_indicator"] = df["cancellation_datetime"].notnull().astype(int)  # Task 1 labeling
 
-    produce_days_before_cancelling_feature(df)
     df = df[df['hotel_star_rating'].isin(np.arange(0, 5.5, 0.5))]
     df['hotel_star_rating'] = df['hotel_star_rating'].clip(lower=0)
 
@@ -80,6 +72,8 @@ def preprocess_train_task2(data_path):
     # df = pd.get_dummies(df, columns=COLUMNS_TO_DUMMIES)
 
     return df
+
+
 def preprocess_test_task2(df):
     # cols = "guest_nationality_country_name", "customer_nationality"
     # df = pd.get_dummies(df, columns=cols)

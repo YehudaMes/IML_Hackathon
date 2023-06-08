@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
-# DATA_PATH = "../../../Agoda - Data/agoda_cancellation_train.csv" // todo: at end this one should be used!
+# DATA_PATH = "../../../agoda_data/agoda_cancellation_train.csv" // todo: at end this one should be used!
 DATA_PATH = "data/train.csv"
 
 COLS_TO_DROP = ["h_booking_id", "hotel_id", "cancellation_datetime", "checkin_date", "checkout_date",
