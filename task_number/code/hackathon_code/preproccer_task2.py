@@ -64,7 +64,7 @@ def preprocess_train_task2(data_path):
 
     df["cancellation_indicator"] = df["cancellation_datetime"].notnull().astype(int)  # Task 1 labeling
 
-    common_column_edit(df, COLS_TO_DROP, COLUMNS_TO_DUMMIES)
+    df=common_column_edit(df, COLS_TO_DROP, COLUMNS_TO_DUMMIES)
 
     df = df[df['hotel_star_rating'].isin(np.arange(0, 5.5, 0.5))]
     df['hotel_star_rating'] = df['hotel_star_rating'].clip(lower=0)

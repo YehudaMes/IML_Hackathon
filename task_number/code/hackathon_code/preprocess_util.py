@@ -44,6 +44,6 @@ def common_column_edit(df, cols_to_drop, cols_to_dummies):
     booking_to_checkin_feature(df)
     cancellation_cost_feature(df)
     df["is_first_booking"] = df["is_first_booking"].astype(int)
-    df = df.drop(cols_to_drop, axis=1)
     df = pd.get_dummies(df, columns=cols_to_dummies)
+    df = df.drop(cols_to_drop, axis=1)
     return df
