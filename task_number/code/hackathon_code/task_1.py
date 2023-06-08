@@ -17,17 +17,19 @@ from sklearn.ensemble import GradientBoostingClassifier, VotingClassifier, Rando
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.decomposition import PCA
 
+from task_number.code.hackathon_code.utils import save_model
+
 models = [
-    ("Nearest Neighbors", KNeighborsClassifier(5)),
+    # ("Nearest Neighbors", KNeighborsClassifier(5)),
     # ("Linear SVM", SVC(kernel="linear", probability=True)),
     # ("RBF SVM", SVC(gamma=2, C=1)),
     # ("Gaussian Process", GaussianProcessClassifier(1.0 * RBF(1.0))),
     ("Decision Tree", DecisionTreeClassifier(max_depth=5)),
-    ("Random Forest 5", RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1)),
-    ("Neural Net", MLPClassifier(alpha=1, max_iter=1000)),
+    # ("Random Forest 5", RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1)),
+    # ("Neural Net", MLPClassifier(alpha=1, max_iter=1000)),
     ("AdaBoost", AdaBoostClassifier()),
-    ("Naive Bayes", GaussianNB()),
-    ("QDA", QuadraticDiscriminantAnalysis()),
+    # ("Naive Bayes", GaussianNB()),
+    # ("QDA", QuadraticDiscriminantAnalysis()),
     ('Logistic Regression', LogisticRegression(max_iter=1000)),
     ('Generic Random Forest', RandomForestClassifier()),
     ('Support Vector Machines', SVC()),
@@ -225,16 +227,24 @@ def search_best_hyperparameters(X: np.ndarray, y: np.ndarray):
     print('Best Score:', best_score)
     print('Accuracy:', accuracy)
 
+def fit_and_save_model(X: np.ndarray, y: np.ndarray):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    for name, model in models.copy():
+        print(f"saving {name}")
+        model.fit(X_train, y_train)
+        save_model(model, name)
+
 
 if __name__ == "__main__":
     from preproccer_task1 import load_data
     df = load_data()
     X, y = df.loc[:, df.columns != "cancellation_indicator"], df.cancellation_indicator
     # plot_data(data,y)
-    choose_classification_model(X, y)
+    # choose_classification_model(X, y)
     # choose_cross_validation_classification_model(X, y)
     # ensemble_classification_model(X, y)
     # kernel_methods_classifcation(X,y)
     # search_best_hyperparameters(X, y)
     # evaluate_different_models(data, y)
 
+    fit_and_save_model(X, y)
