@@ -2,18 +2,12 @@
 import numpy as np
 import plotly.graph_objects as go
 
-import matplotlib.pyplot as plt
-from matplotlib.colors import ListedColormap
-from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import make_pipeline
 from sklearn.neural_network import MLPClassifier
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.gaussian_process import GaussianProcessClassifier
-from sklearn.gaussian_process.kernels import RBF
+
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
-from sklearn.inspection import DecisionBoundaryDisplay
 import pandas as pd
 from sklearn.base import BaseEstimator
 from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV
