@@ -17,7 +17,7 @@ from sklearn.ensemble import GradientBoostingClassifier, VotingClassifier, Rando
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.decomposition import PCA
 
-from task_number.code.hackathon_code.utils import save_model, load_model
+from utils import save_model, load_model
 
 models = [
     # ("Nearest Neighbors", KNeighborsClassifier(5)),
