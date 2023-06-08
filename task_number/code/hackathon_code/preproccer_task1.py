@@ -97,7 +97,7 @@ def load_validation_data_task1():
     return preprocess_data_to_validation_task1(path)
 
 
-def load_train_agoda_data():
+def load_train_agoda_data_task1():
     DATA_PATH = "agoda_data/agoda_cancellation_train.csv"
     return preprocess_train_task1(DATA_PATH)
 
