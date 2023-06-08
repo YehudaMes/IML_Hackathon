@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import plotly.express as px
 from sklearn.model_selection import train_test_split
 
 DATA_PATH = "../../../Agoda - Data/agoda_cancellation_train.csv"  # todo: at end this one should be used!
@@ -88,20 +89,54 @@ def preprocess_test_task2(df):
     # and count the occurrences of 1s and 0s
     counts = df.groupby(['customer_nationality', 'cancellation_indicator']).size().unstack(fill_value=0)
 
-    # Plot a grouped bar chart for each unique 'customer_nationality'
-    ax = counts.plot(kind='bar', stacked=False, figsize=(10, 6))
+    Assuming your DataFrame is named 'df' and contains the columns 'customer_nationality' and 'cancellation_indicator'
 
-    # Set labels and title
-    ax.set_xlabel('Customer Nationality')
-    ax.set_ylabel('Count')
-    ax.set_title('Cancellation Indicator Count by Customer Nationality')
+    # Create a bar plot
+    fig = px.histogram(df, x='customer_nationality', color='cancellation_indicator', barmode='group')
+    # fig = px.histogram(counts, x='customer_nationality', color='cancellation_indicator', barmode='group')
 
-    # Set x-axis tick labels
-    ax.set_xticklabels(counts.index, rotation=45, ha='right')
+    # Update layout
+    fig.update_layout(
+        title='Cancellation Indicator by Customer Nationality',
+        xaxis_title='Customer Nationality',
+        yaxis_title='Count',
+        legend_title='Cancellation Indicator',
+        xaxis={'categoryorder': 'total descending'},
+        barmode='group'
+    )
 
     # Show the plot
-    plt.tight_layout()
-    plt.show()
+    fig.show()
+    Assuming your DataFrame is named 'df'
+
+    # Group the DataFrame by 'customer_nationality' and calculate the value counts of 'cancellation_indicator'
+    grouped_counts = df.groupby('customer_nationality')['cancellation_indicator'].value_counts(normalize=True).unstack()
+
+    # Create a new column with the ratio of 1s
+    grouped_counts['Ratio of 1s'] = grouped_counts[1] * 100
+
+    # Create a new column with the ratio of 0s
+    grouped_counts['Ratio of 0s'] = grouped_counts[0] * 100
+
+    # Reset the index to have 'customer_nationality' as a regular column
+    grouped_counts = grouped_counts.reset_index()
+
+    # Create a bar plot
+    fig = px.bar(grouped_counts, x='customer_nationality', y=['Ratio of 1s', 'Ratio of 0s'],
+                 title='Cancellation Indicator by Customer Nationality',
+                 labels={'value': 'Ratio', 'variable': 'Cancellation Indicator'})
+
+    # Update layout
+    fig.update_layout(
+        yaxis=dict(tickformat='.1f', title='Ratio (%)'),
+        xaxis_title='Customer Nationality',
+        legend_title='Cancellation Indicator',
+        xaxis={'categoryorder': 'total descending'}
+    )
+
+    # Show the plot
+    fig.show()
+
 
 
 if __name__ == "__main__":

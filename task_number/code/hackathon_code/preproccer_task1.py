@@ -29,7 +29,7 @@ def produce_days_before_cancelling_feature(df):
 
 
 # Classification
-def load_data():
+def preprocess_train_task1():
     df = pd.read_csv(DATA_PATH)
 
     df["cancellation_indicator"] = df["cancellation_datetime"].notnull().astype(int)  # Task 1 labeling
@@ -39,5 +39,8 @@ def load_data():
     df = df.drop(COLS_TO_DROP, axis=1)
     df = df[df['hotel_star_rating'].isin(np.arange(0, 5.5, 0.5))]
     df = pd.get_dummies(df, columns=COLUMNS_TO_DUMMIES)
-
     return df
+
+
+def preprocess_train_task2(data_path):
+    pass
