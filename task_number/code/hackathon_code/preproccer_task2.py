@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 from sklearn.model_selection import train_test_split
 
-DATA_PATH = "../../../Agoda - Data/agoda_cancellation_train.csv"  # todo: at end this one should be used!
+DATA_PATH = "Agoda - Data/agoda_cancellation_train.csv"  # todo: at end this one should be used!
 # DATA_PATH = "data/train.csv"
 
 # pd.set_option('display.max_rows', None)

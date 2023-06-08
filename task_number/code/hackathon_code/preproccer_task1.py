@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
 # DATA_PATH = "../../../Agoda - Data/agoda_cancellation_train.csv" // todo: at end this one should be used!
-DATA_PATH = "data/train.csv"
 
 COLS_TO_DROP = ["h_booking_id", "hotel_id", "cancellation_datetime", "checkin_date", "checkout_date",
                 "hotel_brand_code", "hotel_chain_code", "hotel_live_date", "booking_datetime",
@@ -34,13 +33,13 @@ def load_train_data():
 
 
 def load_agoda_data():
-    DATA_PATH = "../../../Agoda - Data/agoda_cancellation_train.csv"
+    DATA_PATH = "Agoda - Data/agoda_cancellation_train.csv"
     return preprocess_train_task1(DATA_PATH)
 
 
 # Classification
-def preprocess_train_task1():
-    df = pd.read_csv(DATA_PATH)
+def preprocess_train_task1(path):
+    df = pd.read_csv(path)
 
     df["cancellation_indicator"] = df["cancellation_datetime"].notnull().astype(int)  # Task 1 labeling
 
@@ -53,5 +52,5 @@ def preprocess_train_task1():
     return df
 
 
-def preprocess_train_task2(data_path):
+def preprocess_train_task2(path):
     pass
