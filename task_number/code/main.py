@@ -1,7 +1,5 @@
 import os
-import sys
 
-# from hackathon_code.task_3 import plots_and_info
 from hackathon_code.task_1 import *
 from hackathon_code.task_2 import run_task_2
 from hackathon_code.task_3 import task_3_plots_and_info
@@ -26,4 +24,3 @@ if __name__ == "__main__":
 
     os.chdir("..")
 
-# main(PATH1,PATH2)

@@ -175,7 +175,7 @@ def full_validation(fit_classifier=True, fit_regressor=True):
 
 def run_task_2(test_data_path, output_path, train=False):
     if train:
-        classifier, regressor = fit("./agoda_data/agoda_cancellation_train.csv", TEST_CLASSIFIER_NAME,train=True,
+        classifier, regressor = fit("./agoda_data/agoda_cancellation_train.csv", TEST_CLASSIFIER_NAME, train=True,
                                     regressor_name=TEST_REGRESSOR_NAME)
     else:
         classifier, regressor = load_model(TEST_CLASSIFIER_NAME + "ensemble_3"), load_model(TEST_REGRESSOR_NAME)
