@@ -3,8 +3,7 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objs as go
 from sklearn.decomposition import PCA
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, AdaBoostRegressor, VotingClassifier, \
-    GradientBoostingClassifier, AdaBoostClassifier
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, AdaBoostRegressor
 from sklearn.linear_model import Lasso
 from sklearn.linear_model import LinearRegression, ElasticNet
 from sklearn.linear_model import Ridge
@@ -13,10 +12,10 @@ from sklearn.neighbors import KNeighborsRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
-from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
+from sklearn.tree import DecisionTreeRegressor
 
 from IML_Hackathon.task_number.code.hackathon_code.task_1 import fit_and_save_ensemble_3
-from preproccer_task2 import preprocess_train_task2_raw, preprocess_test_task2, task_2_train_preprocess
+from preproccer_task2 import preprocess_test_task2, task_2_train_preprocess
 from transform_task_2 import ClassifierTransformer
 from utils import save_model, load_model
 
@@ -24,9 +23,8 @@ CLASSIFIER_NAME = "ClassificationRowAdder"
 REGRESSOR_NAME = "Regressor"
 TRAIN_PATH = "./data/train.csv"
 
-TEST_CLASSIFIER_NAME="task_2_test_classifier"
-TEST_REGRESSOR_NAME="task_2_test_regressor"
-
+TEST_CLASSIFIER_NAME = "task_2_test_classifier"
+TEST_REGRESSOR_NAME = "task_2_test_regressor"
 
 
 def get_regressors_models():
@@ -62,25 +60,25 @@ def get_regressors_models():
     return models
 
 
-
-
 def get_pipeline(classifier, regressor):
     return Pipeline([(CLASSIFIER_NAME, ClassifierTransformer(classifier)),
                      (REGRESSOR_NAME, regressor)])
 
 
-def fit(data_path, classifier_name=None, fit_classifier=True, regressor_path="regressor"):
+def fit(data_path, classifier_name=None, fit_classifier=True, regressor_name="regressor", fit_regressor=True):
     train_X, train_y, classifier_y = task_2_train_preprocess(data_path)
     if not fit_classifier:
-        classifier = load_model(classifier_name+"ensemble_3")
+        classifier = load_model(classifier_name + "ensemble_3")
     else:
-        classifier=fit_and_save_ensemble_3(train_X, classifier_y, classifier_name)
+        classifier = fit_and_save_ensemble_3(train_X, classifier_y, classifier_name)
     print("classifier fitted")
-    regressor = Pipeline([('scaler', StandardScaler()), ('Decision Tree', DecisionTreeRegressor())])
-    regressor.fit(train_X.loc[classifier_y == 1], train_y.loc[classifier_y == 1])
-    save_model(regressor, regressor_path)
+    if fit_regressor:
+        regressor = Pipeline([('scaler', StandardScaler()), ('Decision Tree', DecisionTreeRegressor())])
+        regressor.fit(train_X.loc[classifier_y == 1], train_y.loc[classifier_y == 1])
+        save_model(regressor, regressor_name)
+    else:
+        regressor = load_model(regressor_name, regressor_name)
     return classifier, regressor
-
 
 
 def visualize_data_pca_response(data, response):
@@ -144,11 +142,11 @@ def pca_visualization():
 
 
 def predict(X, classifier, regressor, ids=None, output_path=None, save=False):
-    cancel=classifier.predict(X)
-    loss=-np.ones(len(X))
-    price_inds=cancel==1
-    price=regressor.predict(X.loc[price_inds])
-    loss[price_inds]=price
+    cancel = classifier.predict(X)
+    loss = -np.ones(len(X))
+    price_inds = cancel == 1
+    price = regressor.predict(X.loc[price_inds])
+    loss[price_inds] = price
     if save:
         pd.DataFrame({"ID": ids, "predicted_selling_amount": loss}).to_csv(output_path, index=False)
     else:
@@ -156,40 +154,40 @@ def predict(X, classifier, regressor, ids=None, output_path=None, save=False):
 
 
 def read_models(base_path):
-    return load_model(base_path+CLASSIFIER_NAME), load_model(base_path+REGRESSOR_NAME)
+    return load_model(base_path + CLASSIFIER_NAME), load_model(base_path + REGRESSOR_NAME)
 
 
 def check_against_validation(validation_path, classifier, regressor):
-    X,y,_=task_2_train_preprocess(validation_path)
-    print(f"validation, RMSE: {RMSE(X,y,classifier,regressor)}")
-
+    X, y, _ = task_2_train_preprocess(validation_path, save_columns=False)
+    print(f"validation, RMSE: {RMSE(X, y, classifier, regressor)}")
 
 
 def RMSE(X, y, classifier, regressor):
-    rmse=np.sqrt(np.sum((predict(X,classifier,regressor)-y)**2)/len(y))
+    rmse = np.sqrt(np.sum((predict(X, classifier, regressor) - y) ** 2) / len(y))
     return rmse
 
 
-def full_validation():
-    classifier, regressor=fit("./data/train.csv", classifier_name="task_2_validation_classifier",fit_classifier=True, regressor_path="validation_regressor")
-    check_against_validation("./data/validation.csv",classifier, regressor)
+def full_validation(fit_classifier=True, fit_regressor=True):
+    classifier, regressor = fit("./data/train.csv", classifier_name="task_2_validation_classifier", fit_classifier=fit_classifier,
+                                regressor_name="validation_regressor", fit_regressor=fit_regressor)
+    check_against_validation("./data/validation.csv", classifier, regressor)
 
 
 def task_2_test(test_data_path, train=False, output_path="agoda_cost_of_cancelation"):
     if train:
-        classifier, regressor=fit("./agoda_data/agoda_cancellation_train.csv",TEST_CLASSIFIER_NAME,regressor_path=TEST_REGRESSOR_NAME)
+        classifier, regressor = fit("./agoda_data/agoda_cancellation_train.csv", TEST_CLASSIFIER_NAME,
+                                    regressor_name=TEST_REGRESSOR_NAME)
     else:
-        classifier, regressor=load_model(TEST_CLASSIFIER_NAME+"ensemble_3"), load_model(TEST_REGRESSOR_NAME)
-    ids,test_X=preprocess_test_task2(test_data_path)
-    predict(test_X,classifier,regressor,ids=ids, output_path=output_path, save=True)
+        classifier, regressor = load_model(TEST_CLASSIFIER_NAME + "ensemble_3"), load_model(TEST_REGRESSOR_NAME)
+    ids, test_X = preprocess_test_task2(test_data_path)
+    predict(test_X, classifier, regressor, ids=ids, output_path=output_path, save=True)
 
 
 if __name__ == '__main__':
     task_2_test("./agoda_data/Agoda_Test_2.csv", train=True,output_path="agoda_cost_of_cancelation")
-    # full_validation()
+    # full_validation(False, False)
     # fit(TRAIN_PATH)
     # pca_visualization()
-
 
     # model_name, model = evaluate_models(train_X.loc[classifier_y==1][:10000], train_y.loc[classifier_y==1][:10000], models)
     # print(f"chosen model: {model_name}")

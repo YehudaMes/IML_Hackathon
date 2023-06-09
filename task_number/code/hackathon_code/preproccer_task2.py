@@ -77,19 +77,27 @@ def preprocess_train_task2_raw(data_path):
     df = df[df['no_of_children'].isin(np.arange(0, 11, 1))]
 
 
-    # Save the column names as a text file
-    with open(COLUMNS_DATA_PATH, 'w') as file:
-        file.write('\n'.join(df.columns))
 
     return df
 
-def task_2_train_preprocess(path):
+def task_2_train_preprocess(path, save_columns=True):
     df = preprocess_train_task2_raw(path)
     train_y = df.original_selling_amount
     classifier_y = df.cancellation_indicator
     train_X = df.drop(columns=['original_selling_amount', 'cancellation_indicator'])
-
+    # Save the column names as a text file
+    if save_columns:
+        with open(COLUMNS_DATA_PATH, 'w') as file:
+            file.write('\n'.join(train_X.columns))
+    else:
+        with open(COLUMNS_DATA_PATH, 'r') as file:
+            desired_columns = file.read().splitlines()
+            train_X = train_X.reindex(columns=desired_columns, fill_value=0)
     return train_X, train_y, classifier_y
+
+def fill_means(df):
+    df.loc[(df['booking_to_checkin'] < 0) | (df['booking_to_checkin'] > 350),
+           'booking_to_checkin'] = FULL_TRAIN_MEAN_DICT['booking_to_checkin']
 
 
 def preprocess_test_task2(path):
@@ -98,10 +106,11 @@ def preprocess_test_task2(path):
     # Read columns feature of Trained model
     with open(COLUMNS_DATA_PATH, 'r') as file:
         desired_columns = file.read().splitlines()
+    df=common_column_edit(df, COLS_TO_DROP, COLUMNS_TO_DUMMIES)
 
-    desired_columns.remove("cancellation_indicator")
-    desired_columns.remove("original_selling_amount")
-    df = df.drop(COLS_TO_DROP, axis=1)
+    df.loc[(~df['hotel_star_rating'].isin(np.arange(0, 5, 0.5))), 'hotel_star_rating'] = FULL_TRAIN_MEAN_DICT['hotel_star_rating']
+    fill_means(df)
+    df = df.drop(columns=COLS_TO_DROP)
 
     df = df.reindex(columns=desired_columns, fill_value=0)
     return ids,df
