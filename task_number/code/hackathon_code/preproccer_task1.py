@@ -2,10 +2,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
+from preprocess_util import common_column_edit, booking_to_checkin_feature
 
-from preprocess_util import booking_to_checkin_feature, common_column_edit
-
-COLUMNS_DATA_PATH = './columns_data/task1_columns.txt'
+COLUMNS_DATA_PATH = './hackathon_code/columns_data/task1_columns.txt'
 
 MEANS = {'hotel_star_rating': 3,
          'no_of_adults': 2,
@@ -51,11 +50,12 @@ COLUMNS_TO_DUMMIES = [
     "customer_nationality"]
 
 
-def preprocess_train_task1(path):
+def preprocess_train_task1(path, with_edit):
     df = pd.read_csv(path)
     df["cancellation_indicator"] = df["cancellation_datetime"].notnull().astype(int)  # Task 1 labeling
 
-    df = common_column_edit(df, COLS_TO_DROP, COLUMNS_TO_DUMMIES)
+    if with_edit:
+        df = common_column_edit(df, COLS_TO_DROP, COLUMNS_TO_DUMMIES)
 
     df = df[df['hotel_star_rating'].isin(np.arange(0, 5.5, 0.5))]
 
@@ -114,20 +114,20 @@ def preprocess_predict_task1(path):
 
 
 def load_train_data_task1():
-    DATA_PATH = "data/train.csv"
-    return preprocess_train_task1(DATA_PATH)
+    DATA_PATH = "./hackathon_code/data/train.csv"
+    return preprocess_train_task1(DATA_PATH, True)
 
 
 def load_validation_data_task1():
-    path = "data/validation.csv"
+    path = "./hackathon_code/data/validation.csv"
     return preprocess_data_to_validation_task1(path)
 
 
-def load_train_agoda_data_task1():
-    DATA_PATH = "agoda_data/agoda_cancellation_train.csv"
-    return preprocess_train_task1(DATA_PATH)
+def load_train_agoda_data_task1(with_edit):
+    DATA_PATH = "./hackathon_code/agoda_data/agoda_cancellation_train.csv"
+    return preprocess_train_task1(DATA_PATH, with_edit)
 
 
 def load_test_agoda_data_task1():
-    path = "agoda_data/Agoda_Test_1.csv"
+    path = "./hackathon_code/agoda_data/Agoda_Test_1.csv"
     return preprocess_predict_task1(path)
