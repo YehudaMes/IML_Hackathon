@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
+
 from preprocess_util import common_column_edit
 
 COLUMNS_DATA_PATH = '../hackathon_code/columns_data/task1_columns.txt'
@@ -58,12 +57,12 @@ def preprocess_train_task1(path, with_edit):
         df = common_column_edit(df, COLS_TO_DROP, COLUMNS_TO_DUMMIES)
 
     df = df[df['hotel_star_rating'].isin(np.arange(0, 5.5, 0.5))]
+    X, y = df.drop('cancellation_indicator', axis=1), df['cancellation_indicator']
 
     # Save the column names as a text file
     with open(COLUMNS_DATA_PATH, 'w') as file:
-        file.write('\n'.join(df.columns))
+        file.write('\n'.join(X.columns))
 
-    X, y = df.drop('cancellation_indicator', axis=1), df['cancellation_indicator']
     return X, y
 
 
@@ -76,7 +75,7 @@ def preprocess_data_to_validation_task1(path):
 
     df["cancellation_indicator"] = df["cancellation_datetime"].notnull().astype(int)  # Task 1 labeling
 
-    common_column_edit(df, COLS_TO_DROP, COLUMNS_TO_DUMMIES)
+    df = common_column_edit(df, COLS_TO_DROP, COLUMNS_TO_DUMMIES)
 
     df.loc[(~df['hotel_star_rating'].isin(np.arange(0, 5, 0.5))), 'hotel_star_rating'] = MEANS['hotel_star_rating']
     fill_means(df)
@@ -101,14 +100,11 @@ def preprocess_predict_task1(path):
     with open(COLUMNS_DATA_PATH, 'r') as file:
         desired_columns = file.read().splitlines()
 
-    cols_to_drop = COLS_TO_DROP.copy()
-    cols_to_drop.remove("cancellation_datetime")
-    common_column_edit(df, cols_to_drop, COLUMNS_TO_DUMMIES)
+    df = common_column_edit(df, COLS_TO_DROP, COLUMNS_TO_DUMMIES)
 
     df.loc[(~df['hotel_star_rating'].isin(np.arange(0, 5, 0.5))), 'hotel_star_rating'] = MEANS['hotel_star_rating']
     fill_means(df)
 
-    desired_columns.remove('cancellation_indicator')
     df = df.reindex(columns=desired_columns, fill_value=0)
     return df
 

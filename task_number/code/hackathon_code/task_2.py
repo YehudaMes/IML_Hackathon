@@ -14,7 +14,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
 from sklearn.tree import DecisionTreeRegressor
 
-from IML_Hackathon.task_number.code.hackathon_code.task_1 import fit_and_save_ensemble_3
+from task_1 import fit_and_save_ensemble_3
 from preproccer_task2 import preprocess_test_task2, task_2_train_preprocess
 from transform_task_2 import ClassifierTransformer
 from utils import save_model, load_model
@@ -175,7 +175,7 @@ def full_validation(fit_classifier=True, fit_regressor=True):
 
 def task_2_test(test_data_path, train=False, output_path="agoda_cost_of_cancelation"):
     if train:
-        classifier, regressor = fit("./agoda_data/agoda_cancellation_train.csv", TEST_CLASSIFIER_NAME,
+        classifier, regressor = fit("./agoda_data/agoda_cancellation_train.csv", TEST_CLASSIFIER_NAME,train=True,
                                     regressor_name=TEST_REGRESSOR_NAME)
     else:
         classifier, regressor = load_model(TEST_CLASSIFIER_NAME + "ensemble_3"), load_model(TEST_REGRESSOR_NAME)

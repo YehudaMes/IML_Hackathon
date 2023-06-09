@@ -19,7 +19,8 @@ from sklearn.ensemble import GradientBoostingClassifier, VotingClassifier, Rando
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.decomposition import PCA
 
-from utils import save_model, load_model
+from .utils import *
+from .preproccer_task1 import *
 
 models = [
     ("Nearest Neighbors", KNeighborsClassifier(5)),
@@ -141,21 +142,14 @@ def fit_and_save_model(X_train: np.ndarray, y_train: np.ndarray):
 
 def write_file(path, id_array, cancellation_array):
     # Combining the id and cancellation arrays into a single array
-    data = np.column_stack((id_array, cancellation_array))
-
-    # Writing the data to a CSV file
-    filename = "agoda_cancellation_prediction.csv"
-
-    with open(filename, mode='w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(["id", "cancellation"])  # Writing the header
-        writer.writerows(data)  # Writing the data rows
+    pd.DataFrame({"ID": id_array, "cancellation": cancellation_array})\
+        .to_csv(path, index=False)
 
     print("CSV file created successfully.")
 
+
 def run_task_1(path_to_input):
-    model = load_model('full_agoda_ensemble_3')
-    from .preproccer_task1 import preprocess_predict_task1
+    model = load_model('agoda_all_ensemble_3')
     ids = pd.read_csv(path_to_input)['h_booking_id']
 
     test_X = preprocess_predict_task1(path_to_input)
@@ -163,20 +157,22 @@ def run_task_1(path_to_input):
 
     write_file('../../predictions/agoda_cancellation_prediction.csv', ids, test_y)
 
+
 if __name__ == "__main__":
-#
-    from preproccer_task1 import load_train_data_task1, load_validation_data_task1, load_train_agoda_data_task1
-#
-    # X, y = load_train_data_task1()
-#     X_test, y_test = load_validation_data_task1()
-#
-#     # fit_and_save_model(X_train, y_train)
-#     # load_model_and_predict(X_test, y_test)
-#     # fit_and_save_ensemble_3(X, y, "train_")
-#     # model_predict(load_model("train_"+'ensemble_3'), "validation "+'ensemble_3', X_test, y_test)
-#
-    X_all, y_all = load_train_agoda_data_task1(True)
-    fit_and_save_ensemble_3(X_all, y_all, "agoda_all_")
+    run_task_1("agoda_data/Agoda_Test_1.csv")
+# #
+#     from preproccer_task1 import load_train_data_task1, load_validation_data_task1, load_train_agoda_data_task1
+# #
+#     # X, y = load_train_data_task1()
+# #     X_test, y_test = load_validation_data_task1()
+# #
+# #     # fit_and_save_model(X_train, y_train)
+# #     # load_model_and_predict(X_test, y_test)
+# #     # fit_and_save_ensemble_3(X, y, "train_")
+# #     # model_predict(load_model("train_"+'ensemble_3'), "validation "+'ensemble_3', X_test, y_test)
+# #
+#     X_all, y_all = preprocess_t1.load_train_agoda_data_task1(True)
+#     fit_and_save_ensemble_3(X_all, y_all, "agoda_all_")
 
     # # ensemble_classification_model(X, y)
     # plot_train_result().write_image("classification_models_performance.png")

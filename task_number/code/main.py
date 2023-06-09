@@ -1,12 +1,8 @@
 import os
-from hackathon_code.task_3 import plots_and_info
-from hackathon_code.task_1 import run_task_1
+import sys
 
-
-
-
-
-
+# from hackathon_code.task_3 import plots_and_info
+from hackathon_code.task_1 import *
 
 if __name__ == "__main__":
     os.chdir("hackathon_code")
@@ -23,7 +19,7 @@ if __name__ == "__main__":
     except Exception() as e:
         print(e)
     try:
-        plots_and_info()
+        # plots_and_info()
         pass
     except Exception() as e:
         print(e)

@@ -1,10 +1,7 @@
 import pandas as pd
 import numpy as np
 
-import matplotlib.pyplot as plt
-import plotly.express as px
-from sklearn.model_selection import train_test_split
-from preprocess_util import booking_to_checkin_feature, common_column_edit
+from preprocess_util import common_column_edit
 
 COLUMNS_DATA_PATH = './columns_data/task2_columns.txt'
 DATA_PATH = "agoda_data/agoda_cancellation_train.csv"  # todo: at end this one should be used!
@@ -110,7 +107,7 @@ def preprocess_test_task2(path):
 
     df.loc[(~df['hotel_star_rating'].isin(np.arange(0, 5, 0.5))), 'hotel_star_rating'] = FULL_TRAIN_MEAN_DICT['hotel_star_rating']
     fill_means(df)
-    df = df.drop(columns=COLS_TO_DROP)
+    df = df.drop(columns=COLS_TO_DROP,errors='ignore')
 
     df = df.reindex(columns=desired_columns, fill_value=0)
     return ids,df

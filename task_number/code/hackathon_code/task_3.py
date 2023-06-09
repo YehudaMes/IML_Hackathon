@@ -4,7 +4,7 @@ from sklearn.feature_selection import SelectKBest, chi2, f_classif, mutual_info_
 import pandas as pd
 import plotly.express as px
 
-from .preproccer_task1 import load_train_agoda_data_task1
+from preproccer_task1 import load_train_agoda_data_task1
 
 TRAIN_AGODA_PATH = "./hackathon_code/agoda_data/agoda_cancellation_train.csv"
 

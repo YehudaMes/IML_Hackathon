@@ -48,10 +48,10 @@ def common_column_edit(df, cols_to_drop, cols_to_dummies):
     booking_to_checkin_feature(df)
     cancellation_cost_feature(df)
     df["is_first_booking"] = df["is_first_booking"].astype(int)
-    df = pd.get_dummies(df, columns=cols_to_dummies, prefix="dummy")
+    df = pd.get_dummies(df, columns=cols_to_dummies, prefix_sep="___")
     cols_to_drop=copy(cols_to_drop)
     for col in df.columns:
-        if "dummy" in col and df[col].sum()<=18:
+        if "___" in col and np.sum(df.loc[:, col].astype(int)) <= 18:
             cols_to_drop.append(col)
-    df = df.drop(cols_to_drop, axis=1)
+    df = df.drop(columns=cols_to_drop, errors='ignore')
     return df
