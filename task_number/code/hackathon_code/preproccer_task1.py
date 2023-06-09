@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
-from preprocess_util import common_column_edit, booking_to_checkin_feature
+from .preprocess_util import common_column_edit
 
 COLUMNS_DATA_PATH = './hackathon_code/columns_data/task1_columns.txt'
 
