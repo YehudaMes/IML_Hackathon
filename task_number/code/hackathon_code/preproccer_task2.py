@@ -60,7 +60,7 @@ COLUMS_TO_CHECK = ["charge_option", "guest_nationality_country_name"]
 
 
 # Regression
-def preprocess_train_task2(data_path):
+def preprocess_train_task2_raw(data_path):
     df = pd.read_csv(data_path)
 
     df["cancellation_indicator"] = df["cancellation_datetime"].notnull().astype(int)  # Task 1 labeling
@@ -83,10 +83,18 @@ def preprocess_train_task2(data_path):
 
     return df
 
+def task_2_train_preprocess(path):
+    df = preprocess_train_task2_raw(path)
+    train_y = df.original_selling_amount
+    classifier_y = df.cancellation_indicator
+    train_X = df.drop(columns=['original_selling_amount', 'cancellation_indicator'])
+
+    return train_X, train_y, classifier_y
+
 
 def preprocess_test_task2(path):
     df = pd.read_csv(path)
-
+    ids=df.h_booking_id
     # Read columns feature of Trained model
     with open(COLUMNS_DATA_PATH, 'r') as file:
         desired_columns = file.read().splitlines()
@@ -96,8 +104,8 @@ def preprocess_test_task2(path):
     df = df.drop(COLS_TO_DROP, axis=1)
 
     df = df.reindex(columns=desired_columns, fill_value=0)
-    return df
+    return ids,df
 
 
 if __name__ == "__main__":
-    preprocess_train_task2(DATA_PATH)
+    preprocess_train_task2_raw(DATA_PATH)

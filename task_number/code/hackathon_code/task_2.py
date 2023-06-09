@@ -15,7 +15,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
 from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
 
-from preproccer_task2 import preprocess_train_task2
+from IML_Hackathon.task_number.code.hackathon_code.task_1 import fit_and_save_ensemble_3
+from preproccer_task2 import preprocess_train_task2_raw, preprocess_test_task2, task_2_train_preprocess
 from transform_task_2 import ClassifierTransformer
 from utils import save_model, load_model
 
@@ -23,14 +24,44 @@ CLASSIFIER_NAME = "ClassificationRowAdder"
 REGRESSOR_NAME = "Regressor"
 TRAIN_PATH = "./data/train.csv"
 
+TEST_CLASSIFIER_NAME="task_2_test_classifier"
+TEST_REGRESSOR_NAME="task_2_test_regressor"
 
-def task_2_train_preprocess(path):
-    df = preprocess_train_task2(path)
-    train_y = df.original_selling_amount
-    classifier_y = df.cancellation_indicator
-    train_X = df.drop(columns=['original_selling_amount', 'cancellation_indicator'])
 
-    return train_X, train_y, classifier_y
+
+def get_regressors_models():
+    decision_models = [
+        (f'decision tree regressor {depth}', Pipeline(
+            [('scaler', StandardScaler()),
+             (f'decision tree regressor {depth}', RandomForestRegressor(max_depth=depth))]))
+        for depth in range(4, 9)]
+    decision_models.extend([
+        ('Random Forest', Pipeline([('scaler', StandardScaler()), ('Random Forest', RandomForestRegressor())])),
+        ('ElasticNet Regression 0.5',
+         Pipeline([('scaler', StandardScaler()), ('ElasticNet Regression 0.5', ElasticNet(alpha=0.5))])),
+        ('ElasticNet Regression 1',
+         Pipeline([('scaler', StandardScaler()), ('ElasticNet Regression 1', ElasticNet(alpha=1))])),
+        ('ElasticNet Regression 1.5',
+         Pipeline([('scaler', StandardScaler()), ('ElasticNet Regression 1.5', ElasticNet(alpha=1.5))])),
+        ('Decision Tree', Pipeline([('scaler', StandardScaler()), ('Decision Tree', DecisionTreeRegressor())])),
+        ('Gradient Boosting',
+         Pipeline([('scaler', StandardScaler()), ('Gradient Boosting', GradientBoostingRegressor())])),
+        ('K-Nearest Neighbors',
+         Pipeline([('scaler', StandardScaler()), ('K-Nearest Neighbors', KNeighborsRegressor())])),
+        ('Laso Regression 0.5', Pipeline([('scaler', StandardScaler()), ('Laso Regression 0.5', Lasso(alpha=0.5))])),
+        ('Ridge Regression 0.5', Pipeline([('scaler', StandardScaler()), ('Ridge Regression 0.5', Ridge(alpha=0.5))])),
+        ('Laso Regression 1', Pipeline([('scaler', StandardScaler()), ('Laso Regression 1', Lasso(alpha=1))])),
+        ('Ridge Regression 1', Pipeline([('scaler', StandardScaler()), ('Ridge Regression 1', Ridge(alpha=1))])),
+        ('Laso Regression 1.5', Pipeline([('scaler', StandardScaler()), ('Laso Regression 1.5', Lasso(alpha=1.5))])),
+        ('Ridge Regression 1.5', Pipeline([('scaler', StandardScaler()), ('Ridge Regression 1.5', Ridge(alpha=1.5))])),
+        ('Linear Regression', Pipeline([('scaler', StandardScaler()), ('Linear Regression', LinearRegression())])),
+        ('adaboost', Pipeline([('scaler', StandardScaler()), ('adaboost', AdaBoostRegressor())])),
+        ('Support Vector Regression', Pipeline([('scaler', StandardScaler()), ('Support Vector Regression', SVR())]))
+    ])
+    models = decision_models
+    return models
+
+
 
 
 def get_pipeline(classifier, regressor):
@@ -38,29 +69,17 @@ def get_pipeline(classifier, regressor):
                      (REGRESSOR_NAME, regressor)])
 
 
-def fit(train_path, classifier_path=None, classifier_fit=True):
-    if classifier_fit:
-        classifier = load_model(classifier_path)
+def fit(data_path, classifier_name=None, fit_classifier=True, regressor_path="regressor"):
+    train_X, train_y, classifier_y = task_2_train_preprocess(data_path)
+    if not fit_classifier:
+        classifier = load_model(classifier_name+"ensemble_3")
     else:
-        model1 = DecisionTreeClassifier(max_depth=5)
-        model2 = AdaBoostClassifier()
-        model3 = GradientBoostingClassifier()
-
-        # Create the ensemble by combining the models using VotingClassifier
-        classifier = VotingClassifier(
-            estimators=[('DecisionTree', model1), ('AdaBoost', model2), ('GradientBoosting', model3)], voting='hard')
-    train_X, train_y, classifier_y = task_2_train_preprocess(train_path)
-    classifier.fit(train_X, classifier_y)
-    regressor = RandomForestRegressor()
-    regressor.fit(train_X.loc[classifier_y == 1], train_y.loc[classifier_y == 1])
-
-    # pipeline = get_pipeline(classifier=classifier, regressor=regressor)
-    save_model(classifier, "task_2_train_classifier")
+        classifier=fit_and_save_ensemble_3(train_X, classifier_y, classifier_name)
     print("classifier fitted")
-    # pipeline.fit(train_X, train_y,
-    #              **{f"{CLASSIFIER_NAME}__y_classifier": classifier_y, f"{CLASSIFIER_NAME}__fit_again": False})
-    save_model(regressor, "task_2_train_regressor")
-    # save_model(pipeline, "task_2_train_pipline")
+    regressor = Pipeline([('scaler', StandardScaler()), ('Decision Tree', DecisionTreeRegressor())])
+    regressor.fit(train_X.loc[classifier_y == 1], train_y.loc[classifier_y == 1])
+    save_model(regressor, regressor_path)
+    return classifier, regressor
 
 
 
@@ -136,59 +155,44 @@ def predict(X, classifier, regressor, ids=None, output_path=None, save=False):
         return loss
 
 
+def read_models(base_path):
+    return load_model(base_path+CLASSIFIER_NAME), load_model(base_path+REGRESSOR_NAME)
+
+
+def check_against_validation(validation_path, classifier, regressor):
+    X,y,_=preprocess_train_task2_raw(validation_path)
+    print(f"validation, RMSE: {RMSE(X,y,classifier,regressor)}")
 
 
 
+def RMSE(X, y, classifier, regressor):
+    rmse=np.sqrt(np.sum((predict(X,classifier,regressor)-y)**2)/len(y))
+    return rmse
 
+
+def full_validation():
+    classifier, regressor=fit("./data/train.csv", classifier_name="task_2_validation_classifier",fit_classifier=True, regressor_path="validation_regressor")
+    check_against_validation("./data/validation.csv",classifier, regressor)
+
+
+def task_2_test(test_data_path, train=False, output_path="agoda_cost_of_cancelation"):
+    if train:
+        classifier, regressor=fit("./agoda_data/agoda_cancellation_train.csv",TEST_CLASSIFIER_NAME,regressor_path=TEST_REGRESSOR_NAME)
+    else:
+        classifier, regressor=load_model(TEST_CLASSIFIER_NAME+"ensemble_3"), load_model(TEST_REGRESSOR_NAME)
+    ids,test_X=preprocess_test_task2(test_data_path)
+    predict(test_X,classifier,regressor,ids=ids, output_path=output_path, save=True)
 
 
 if __name__ == '__main__':
+    task_2_test("./agoda_data/Agoda_Test_2.csv", train=True,output_path="agoda_cost_of_cancelation")
+    # full_validation()
     # fit(TRAIN_PATH)
     # pca_visualization()
-    train_X, train_y, classifier_y = task_2_train_preprocess(TRAIN_PATH)
-    # decision_models = [("RandomForest",
-    #                     Pipeline([('scaler', StandardScaler()), (
-    #                     "BaggingRegressor", BaggingRegressor(base_estimator=RandomForestRegressor()))])),
-    #     ("BaggingRegressor-decision tree 10",
-    #     Pipeline([('scaler', StandardScaler()), ("BaggingRegressor", BaggingRegressor(base_estimator=DecisionTreeRegressor(max_depth=10)))])),
-    #                    ("BaggingRegressor-decision tree",
-    #                     Pipeline([('scaler', StandardScaler()), (
-    #                     "BaggingRegressor", BaggingRegressor(base_estimator=DecisionTreeRegressor()))])),
-    #                    ("RandomForest",
-    #                     Pipeline([('scaler', StandardScaler()), (
-    #                     "BaggingRegressor", BaggingRegressor(base_estimator=RandomForestRegressor(max_depth=10)))]))
-    #                    ]
-    decision_models = [
-        (f'decision tree regressor {depth}', Pipeline(
-            [('scaler', StandardScaler()),
-             (f'decision tree regressor {depth}', RandomForestRegressor(max_depth=depth))]))
-        for depth in range(4, 9)]
-    decision_models.extend([
-        ('Random Forest', Pipeline([('scaler', StandardScaler()), ('Random Forest', RandomForestRegressor())])),
-        ('ElasticNet Regression 0.5',
-         Pipeline([('scaler', StandardScaler()), ('ElasticNet Regression 0.5', ElasticNet(alpha=0.5))])),
-        ('ElasticNet Regression 1',
-         Pipeline([('scaler', StandardScaler()), ('ElasticNet Regression 1', ElasticNet(alpha=1))])),
-        ('ElasticNet Regression 1.5',
-         Pipeline([('scaler', StandardScaler()), ('ElasticNet Regression 1.5', ElasticNet(alpha=1.5))])),
-        ('Decision Tree', Pipeline([('scaler', StandardScaler()), ('Decision Tree', DecisionTreeRegressor())])),
-        ('Gradient Boosting',
-         Pipeline([('scaler', StandardScaler()), ('Gradient Boosting', GradientBoostingRegressor())])),
-        ('K-Nearest Neighbors',
-         Pipeline([('scaler', StandardScaler()), ('K-Nearest Neighbors', KNeighborsRegressor())])),
-        ('Laso Regression 0.5', Pipeline([('scaler', StandardScaler()), ('Laso Regression 0.5', Lasso(alpha=0.5))])),
-        ('Ridge Regression 0.5', Pipeline([('scaler', StandardScaler()), ('Ridge Regression 0.5', Ridge(alpha=0.5))])),
-        ('Laso Regression 1', Pipeline([('scaler', StandardScaler()), ('Laso Regression 1', Lasso(alpha=1))])),
-        ('Ridge Regression 1', Pipeline([('scaler', StandardScaler()), ('Ridge Regression 1', Ridge(alpha=1))])),
-        ('Laso Regression 1.5', Pipeline([('scaler', StandardScaler()), ('Laso Regression 1.5', Lasso(alpha=1.5))])),
-        ('Ridge Regression 1.5', Pipeline([('scaler', StandardScaler()), ('Ridge Regression 1.5', Ridge(alpha=1.5))])),
-        ('Linear Regression', Pipeline([('scaler', StandardScaler()), ('Linear Regression', LinearRegression())])),
-        ('adaboost',Pipeline([('scaler', StandardScaler()), ('adaboost', AdaBoostRegressor())])),
-        ('Support Vector Regression', Pipeline([('scaler', StandardScaler()), ('Support Vector Regression', SVR())]))
-    ])
-    models = decision_models
-    model_name, model = evaluate_models(train_X.loc[classifier_y==1][:10000], train_y.loc[classifier_y==1][:10000], models)
-    print(f"chosen model: {model_name}")
+
+
+    # model_name, model = evaluate_models(train_X.loc[classifier_y==1][:10000], train_y.loc[classifier_y==1][:10000], models)
+    # print(f"chosen model: {model_name}")
 # np.random.seed(0)
 # num_points = 1000
 # data = np.random.randn(num_points, 5)
