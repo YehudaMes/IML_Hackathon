@@ -16,7 +16,6 @@ from sklearn.tree import DecisionTreeRegressor
 
 from .task_1 import fit_and_save_ensemble_3
 from .preproccer_task2 import preprocess_test_task2, task_2_train_preprocess
-from .transform_task_2 import ClassifierTransformer
 from .utils import save_model, load_model
 
 CLASSIFIER_NAME = "ClassificationRowAdder"

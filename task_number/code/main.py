@@ -9,7 +9,7 @@ if __name__ == "__main__":
     path_to_task_1_input = "./agoda_data/Agoda_Test_1.csv"
     path_to_task_2_input = "./agoda_data/Agoda_Test_2.csv"
     try:
-        run_task_1(path_to_task_1_input)
+        run_task_1(path_to_task_1_input, output_path='../../predictions/agoda_cancellation_prediction.csv')
     except Exception() as e:
         print(e)
     try:

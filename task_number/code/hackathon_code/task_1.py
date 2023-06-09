@@ -148,14 +148,14 @@ def write_file(path, id_array, cancellation_array):
     print("CSV file created successfully.")
 
 
-def run_task_1(path_to_input):
+def run_task_1(path_to_input, output_path):
     ids = pd.read_csv(path_to_input)['h_booking_id']
     model = load_model('agoda_all_ensemble_3')
 
     test_X = preprocess_predict_task1(path_to_input)
     test_y = model.predict(test_X)
 
-    write_file('../../predictions/agoda_cancellation_prediction.csv', ids, test_y)
+    write_file(output_path, ids, test_y)
 
 
 # if __name__ == "__main__":
