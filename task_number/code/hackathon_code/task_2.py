@@ -1,5 +1,6 @@
 # Cost of cancellation - Estimate the expected money loss of order cancellation
 import numpy as np
+import pandas as pd
 import plotly.graph_objs as go
 from sklearn.decomposition import PCA
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, AdaBoostRegressor, VotingClassifier, \
@@ -121,6 +122,21 @@ def evaluate_models(train_X, train_y, models):
 def pca_visualization():
     train_X, train_y = task_2_train_preprocess()
     visualize_data_pca_response(train_X, train_y)
+
+
+def predict(X, classifier, regressor, ids=None, output_path=None, save=False):
+    cancel=classifier.predict(X)
+    loss=-np.ones(len(X))
+    price_inds=cancel==1
+    price=regressor.predict(X.loc[price_inds])
+    loss[price_inds]=price
+    if save:
+        pd.DataFrame({"ID": ids, "predicted_selling_amount": loss}).to_csv(output_path, index=False)
+    else:
+        return loss
+
+
+
 
 
 
