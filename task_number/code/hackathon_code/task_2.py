@@ -160,7 +160,7 @@ def read_models(base_path):
 
 
 def check_against_validation(validation_path, classifier, regressor):
-    X,y,_=preprocess_train_task2_raw(validation_path)
+    X,y,_=task_2_train_preprocess(validation_path)
     print(f"validation, RMSE: {RMSE(X,y,classifier,regressor)}")
 
 
