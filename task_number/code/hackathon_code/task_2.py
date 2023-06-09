@@ -14,10 +14,10 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
 from sklearn.tree import DecisionTreeRegressor
 
-from task_1 import fit_and_save_ensemble_3
-from preproccer_task2 import preprocess_test_task2, task_2_train_preprocess
-from transform_task_2 import ClassifierTransformer
-from utils import save_model, load_model
+from .task_1 import fit_and_save_ensemble_3
+from .preproccer_task2 import preprocess_test_task2, task_2_train_preprocess
+from .transform_task_2 import ClassifierTransformer
+from .utils import save_model, load_model
 
 CLASSIFIER_NAME = "ClassificationRowAdder"
 REGRESSOR_NAME = "Regressor"
@@ -173,7 +173,7 @@ def full_validation(fit_classifier=True, fit_regressor=True):
     check_against_validation("./data/validation.csv", classifier, regressor)
 
 
-def task_2_test(test_data_path, train=False, output_path="agoda_cost_of_cancelation"):
+def run_task_2(test_data_path, output_path, train=False):
     if train:
         classifier, regressor = fit("./agoda_data/agoda_cancellation_train.csv", TEST_CLASSIFIER_NAME,train=True,
                                     regressor_name=TEST_REGRESSOR_NAME)
@@ -183,8 +183,8 @@ def task_2_test(test_data_path, train=False, output_path="agoda_cost_of_cancelat
     predict(test_X, classifier, regressor, ids=ids, output_path=output_path, save=True)
 
 
-if __name__ == '__main__':
-    task_2_test("./agoda_data/Agoda_Test_2.csv", train=True,output_path="agoda_cost_of_cancelation")
+# if __name__ == '__main__':
+#     task_2_test("./agoda_data/Agoda_Test_2.csv", train=False, output_path="../../predictions/agoda_cost_of_cancellation.csv")
     # full_validation(False, False)
     # fit(TRAIN_PATH)
     # pca_visualization()

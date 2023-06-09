@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-from preprocess_util import common_column_edit
+from .preprocess_util import common_column_edit
 
 COLUMNS_DATA_PATH = '../hackathon_code/columns_data/task1_columns.txt'
 

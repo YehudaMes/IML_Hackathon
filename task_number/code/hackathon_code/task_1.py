@@ -149,8 +149,8 @@ def write_file(path, id_array, cancellation_array):
 
 
 def run_task_1(path_to_input):
-    model = load_model('agoda_all_ensemble_3')
     ids = pd.read_csv(path_to_input)['h_booking_id']
+    model = load_model('agoda_all_ensemble_3')
 
     test_X = preprocess_predict_task1(path_to_input)
     test_y = model.predict(test_X)
@@ -158,8 +158,8 @@ def run_task_1(path_to_input):
     write_file('../../predictions/agoda_cancellation_prediction.csv', ids, test_y)
 
 
-if __name__ == "__main__":
-    run_task_1("agoda_data/Agoda_Test_1.csv")
+# if __name__ == "__main__":
+#     run_task_1("agoda_data/Agoda_Test_1.csv")
 # #
 #     from preproccer_task1 import load_train_data_task1, load_validation_data_task1, load_train_agoda_data_task1
 # #

@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-from preprocess_util import common_column_edit
+from .preprocess_util import common_column_edit
 
 COLUMNS_DATA_PATH = './columns_data/task2_columns.txt'
 DATA_PATH = "agoda_data/agoda_cancellation_train.csv"  # todo: at end this one should be used!
