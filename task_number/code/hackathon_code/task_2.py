@@ -19,7 +19,6 @@ from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
 from utils import save_model
 from preproccer_task2 import preprocess_train_task2
 from transform_task_2 import ClassifierTransformer
-from work_temp import naive_preprocess
 
 
 CLASSIFIER_NAME="ClassificationRowAdder"
