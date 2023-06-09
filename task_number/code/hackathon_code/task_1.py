@@ -42,12 +42,6 @@ models = [
 
 ]
 
-# models = [
-#
-#     ("Decision Tree 1", DecisionTreeClassifier(max_depth=5))
-#
-# ]
-
 
 def find_best_model(df_results):
     # Sort the results DataFrame by the desired evaluation metric (e.g., accuracy)
@@ -91,50 +85,10 @@ def plot_2_measures(df_results, title):
     return fig
 
 
-def choose_cross_validation_classification_model(X: np.ndarray, y: np.ndarray) -> BaseEstimator:
-
-    # Train and evaluate models
-    results = []
-    for name, model in models.copy():
-        if name == 'Generic Random Forest':
-            continue
-        scores = cross_val_score(model, X, y, cv=5, scoring='f1_macro')
-
-        print(f"{name} scores: \naccuracy: {scores.mean()},\n\n")
-        results.append((name, scores.mean()))
-
-
-    # Create a DataFrame to store the results
-    df_results = pd.DataFrame(results, columns=['Model', 'F1-score'])
-
-    # Get the best model (the one with the highest accuracy)
-    best_model = find_best_model(df_results)
-
-    # Print the best model
-    print(f"The best model is: {best_model}")
-
-    # Plot the results
-    plot_results(df_results, 'Performance of CV-5 of Different Classification Models')
-
-    return best_model
-
-
-def ensemble_classification_model(X: np.ndarray, y: np.ndarray) -> BaseEstimator:
-
-    # Train and evaluate models
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-    ensemble = fit_and_save_ensemble_3('splitted_', X_train, y_train)
-    # Make predictions
-    y_pred = ensemble.predict(X_test)
-    print("ensemble accuracy: ", accuracy_score(y_test, y_pred))
-    return ensemble
-
-
 def fit_and_save_ensemble_3(X_train, y_train, prefix_name):
     print(prefix_name+'ensemble_3')
     # Define the individual models
-    model1 = DecisionTreeClassifier(max_depth=5)
+    model1 = DecisionTreeClassifier(max_depth=10)
     model2 = AdaBoostClassifier()
     model3 = GradientBoostingClassifier()
     # Create the ensemble by combining the models using VotingClassifier
@@ -145,16 +99,11 @@ def fit_and_save_ensemble_3(X_train, y_train, prefix_name):
     return ensemble
 
 
-def load_model_and_predict(X_test: np.ndarray, y_test: np.ndarray):
+def load_models_and_predict(X_test: np.ndarray, y_test: np.ndarray):
     results = []
     for name, _ in models.copy():
         model = load_model(name)
-        y_pred = model.predict(X_test)
-        accuracy = accuracy_score(y_test, y_pred)
-        precision = precision_score(y_test, y_pred)
-        recall = recall_score(y_test, y_pred)
-        f1 = f1_score(y_test, y_pred, average='macro')
-        print(f"{name} scores: \naccuracy: {accuracy},\nprecision: {precision},\nrecall: {recall},\nf1: {f1}\n\n")
+        accuracy, f1, precision, recall = model_predict(model, name, X_test, y_test)
         results.append((name, accuracy, precision, recall, f1))
 
         # Create a DataFrame to store the results
@@ -171,6 +120,16 @@ def load_model_and_predict(X_test: np.ndarray, y_test: np.ndarray):
     return best_model
 
 
+def model_predict( model, name, X_test, y_test):
+    y_pred = model.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    precision = precision_score(y_test, y_pred)
+    recall = recall_score(y_test, y_pred)
+    f1 = f1_score(y_test, y_pred, average='macro')
+    print(f"{name} scores: \naccuracy: {accuracy},\nprecision: {precision},\nrecall: {recall},\nf1: {f1}\n\n")
+    return accuracy, f1, precision, recall
+
+
 def fit_and_save_model(X_train: np.ndarray, y_train: np.ndarray):
     for name, model in models.copy():
         print(f"saving {name}")
@@ -180,19 +139,18 @@ def fit_and_save_model(X_train: np.ndarray, y_train: np.ndarray):
 
 if __name__ == "__main__":
 
-    from preproccer_task1 import load_train_data_task1
+    from preproccer_task1 import load_train_data_task1, load_validation_data_task1, load_train_agoda_data_task1
+
     X, y = load_train_data_task1()
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    #
-    # # plot_data(data,y)
-    # # choose_classification_model(X, y)
-    # # choose_cross_validation_classification_model(X, y)
-    # # ensemble_classification_model(X, y)
-    # # kernel_methods_classifcation(X,y)
-    # # search_best_hyperparameters(X, y)
-    # # evaluate_different_models(data, y)
-    fit_and_save_model(X_train, y_train)
-    load_model_and_predict(X_test, y_test)
-    # fit_and_save_ensemble_3(X, y, "full_agoda_")
+    X_test, y_test = load_validation_data_task1()
+
+    # fit_and_save_model(X_train, y_train)
+    # load_model_and_predict(X_test, y_test)
+    # fit_and_save_ensemble_3(X, y, "train_")
+    # model_predict(load_model("train_"+'ensemble_3'), "validation "+'ensemble_3', X_test, y_test)
+
+    X_all, y_all = load_train_agoda_data_task1()
+    fit_and_save_ensemble_3(X_all, y_all, "agoda_all_")
+
     # # ensemble_classification_model(X, y)
     # plot_train_result().write_image("classification_models_performance.png")
