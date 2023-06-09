@@ -1,4 +1,6 @@
 # Cancellation prediction - Classification problem
+import csv
+
 import numpy as np
 import plotly.graph_objects as go
 
@@ -120,7 +122,7 @@ def load_models_and_predict(X_test: np.ndarray, y_test: np.ndarray):
     return best_model
 
 
-def model_predict( model, name, X_test, y_test):
+def model_predict(model, name, X_test, y_test):
     y_pred = model.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
     precision = precision_score(y_test, y_pred)
@@ -137,19 +139,43 @@ def fit_and_save_model(X_train: np.ndarray, y_train: np.ndarray):
         save_model(model, name)
 
 
+def write_file(path, id_array, cancellation_array):
+    # Combining the id and cancellation arrays into a single array
+    data = np.column_stack((id_array, cancellation_array))
+
+    # Writing the data to a CSV file
+    filename = "agoda_cancellation_prediction.csv"
+
+    with open(filename, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["id", "cancellation"])  # Writing the header
+        writer.writerows(data)  # Writing the data rows
+
+    print("CSV file created successfully.")
+
+def run_task_1(path_to_input):
+    model = load_model('full_agoda_ensemble_3')
+    from .preproccer_task1 import preprocess_predict_task1
+    ids = pd.read_csv(path_to_input)['h_booking_id']
+
+    test_X = preprocess_predict_task1(path_to_input)
+    test_y = model.predict(test_X)
+
+    write_file('../../predictions/agoda_cancellation_prediction.csv', ids, test_y)
+
 if __name__ == "__main__":
-
+#
     from preproccer_task1 import load_train_data_task1, load_validation_data_task1, load_train_agoda_data_task1
-
-    X, y = load_train_data_task1()
-    X_test, y_test = load_validation_data_task1()
-
-    # fit_and_save_model(X_train, y_train)
-    # load_model_and_predict(X_test, y_test)
-    # fit_and_save_ensemble_3(X, y, "train_")
-    # model_predict(load_model("train_"+'ensemble_3'), "validation "+'ensemble_3', X_test, y_test)
-
-    X_all, y_all = load_train_agoda_data_task1()
+#
+    # X, y = load_train_data_task1()
+#     X_test, y_test = load_validation_data_task1()
+#
+#     # fit_and_save_model(X_train, y_train)
+#     # load_model_and_predict(X_test, y_test)
+#     # fit_and_save_ensemble_3(X, y, "train_")
+#     # model_predict(load_model("train_"+'ensemble_3'), "validation "+'ensemble_3', X_test, y_test)
+#
+    X_all, y_all = load_train_agoda_data_task1(True)
     fit_and_save_ensemble_3(X_all, y_all, "agoda_all_")
 
     # # ensemble_classification_model(X, y)

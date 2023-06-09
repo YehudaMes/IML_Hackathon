@@ -2,9 +2,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
-from .preprocess_util import common_column_edit
+from preprocess_util import common_column_edit
 
-COLUMNS_DATA_PATH = './hackathon_code/columns_data/task1_columns.txt'
+COLUMNS_DATA_PATH = '../hackathon_code/columns_data/task1_columns.txt'
 
 MEANS = {'hotel_star_rating': 3,
          'no_of_adults': 2,
@@ -114,17 +114,17 @@ def preprocess_predict_task1(path):
 
 
 def load_train_data_task1():
-    DATA_PATH = "./hackathon_code/data/train.csv"
+    DATA_PATH = "../hackathon_code/data/train.csv"
     return preprocess_train_task1(DATA_PATH, True)
 
 
 def load_validation_data_task1():
-    path = "./hackathon_code/data/validation.csv"
+    path = "../hackathon_code/data/validation.csv"
     return preprocess_data_to_validation_task1(path)
 
 
 def load_train_agoda_data_task1(with_edit):
-    DATA_PATH = "./hackathon_code/agoda_data/agoda_cancellation_train.csv"
+    DATA_PATH = "../hackathon_code/agoda_data/agoda_cancellation_train.csv"
     return preprocess_train_task1(DATA_PATH, with_edit)
 
 
